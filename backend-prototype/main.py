@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import drug, chat
+from routers import drug, chat, alarm
 
 app = FastAPI()
 
@@ -22,3 +22,4 @@ def root():
 # 라우터 등록
 app.include_router(drug.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
+app.include_router(alarm.router, prefix="/api")
