@@ -1,0 +1,18 @@
+var pillContent = '';
+    if (a.image_url) {
+      // 1. Medicine DB의 이미지가 있는 경우 (실제 사진 출력)
+      pillContent = '<img src="' + a.image_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:'+pR+';" alt="pill">';
+    } else {
+      // 2. 이미지가 없는 경우 (기존 SVG 일러스트 유지)
+      pillContent = '<svg width="24" height="16" viewBox="0 0 30 20" fill="none">'
+        + '<ellipse cx="15" cy="10" rx="13" ry="7" fill="'+a.color+'" opacity="0.22"/>'
+        + '<ellipse cx="15" cy="10" rx="9" ry="4.5" fill="'+a.color+'" opacity="0.45"/>'
+        + '<ellipse cx="15" cy="10" rx="5" ry="2.5" fill="'+a.color+'"/>'
+        + '<line x1="15" y1="3.5" x2="15" y2="16.5" stroke="'+a.color+'" stroke-width="1" opacity="0.35"/>'
+        + '</svg>'
+        + '<span style="font-size:8px;color:'+a.color+';opacity:0.7;">실물사진</span>';
+    }
+
+    var pillBox = '<div style="width:'+pSize+';height:'+pSize+';border-radius:'+pR+';background:'+a.color+'18;border:1px solid '+a.color+'33;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">'
+      + pillContent
+      + '</div>';
