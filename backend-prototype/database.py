@@ -73,6 +73,7 @@ class Alarm(Base):
     medicine_name = Column(String(100))  # 먹어야 할 약 이름
     alarm_time = Column(String(50))  # 알림 시간 (예: "09:00, 19:00")
     is_active = Column(Boolean, default=True)  # 알림 켜짐/꺼짐 상태
+    image_url = Column(String, nullable=True)
 
     owner = relationship("User", back_populates="alarms")
 
