@@ -94,6 +94,22 @@ class Interaction(Base):
     prohibit_content = Column(String) 
     category = Column(String)
     target_group = Column(String)
+# 6. 약물 폐기 알람 테이블
+class DisposalAlarm(Base):
+    __tablename__ = "disposal_alarms"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+
+    medicine_name = Column(String(100))
+    drug_type = Column(String(50))
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    disposal_date = Column(DateTime)
+
+    is_triggered = Column(Boolean, default=False)
+
+    owner = relationship("User")
 
 
 # --- [테이블 정의 끝] ---
