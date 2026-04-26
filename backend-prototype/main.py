@@ -1,5 +1,8 @@
+import threading
+import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from scheduler import check_disposal_alarm
 
 from routers import drug, chat, alarm, disposal_alarm
 
@@ -25,3 +28,14 @@ app.include_router(chat.router, prefix="/api")
 app.include_router(alarm.router, prefix="/api", tags=["Alarm"])
 app.include_router(map.router, prefix="/api/map", tags=["Map"])
 app.include_router(disposal_alarm.router, prefix="/api", tags=["Disposal"])
+
+
+#알람(폐의약품용)
+def run_scheduler():
+    while True:
+        check_disposal_alarm()
+        time.sleep(60)
+
+@app.on_event("startup")
+def start_scheduler():
+    threading.Thread(target=run_scheduler, daemon=True).start()
