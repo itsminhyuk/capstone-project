@@ -14,6 +14,15 @@ async def get_pharmacies(lat: float, lng: float):
 
 @router.get("/waste-bins")
 async def get_bins():
-    # DB의 waste_bins 테이블에 있는 모든 데이터를 리스트로 가져옵니다.
-    bins = db.query(models.WasteBin).all()
-    return bins
+    # DB에서 수거함 데이터를 가져옵니다.
+    bins = db.query(DisposalBin).all()
+    
+    # 프론트엔드 yakpool_app_v8.html은 'place_name'이라는 키를 사용하므로 이름을 맞춰서 반환합니다.
+    return [
+        {
+            "place_name": bin.name, # DB의 name을 프론트엔드의 place_name으로 매핑
+            "address": bin.address,
+            "lat": bin.lat,
+            "lng": bin.lng
+        } for bin in bins
+    ]
