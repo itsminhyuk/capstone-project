@@ -1,10 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from database import load_data, save_data
+
+from database import SessionLocal
+from database import DisposalAlarm
 
 router = APIRouter()
 
-# 🔥 약 종류별 폐기 기간
+# 🔥 폐기 기간 정의
 DRUG_EXPIRY_RULES = {
     "tablet": 365,
     "syrup": 30,
@@ -13,32 +16,45 @@ DRUG_EXPIRY_RULES = {
     "powder": 90
 }
 
+# DB 세션
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 # 🔥 폐기 알람 생성
 @router.post("/disposal")
-def create_disposal_alarm(drug_name: str, drug_type: str):
-    data = load_data()
-
+def create_disposal_alarm(
+    user_id: int,
+    medicine_name: str,
+    drug_type: str,
+    db: Session = Depends(get_db)
+):
     days = DRUG_EXPIRY_RULES.get(drug_type, 30)
-    now = datetime.now()
+
+    now = datetime.utcnow()
     disposal_date = now + timedelta(days=days)
 
-    new_alarm = {
-        "id": len(data["disposal_alarms"]) + 1,
-        "drug_name": drug_name,
-        "drug_type": drug_type,
-        "created_at": now.isoformat(),
-        "disposal_date": disposal_date.isoformat(),
-        "triggered": False
-    }
+    alarm = DisposalAlarm(
+        user_id=user_id,
+        medicine_name=medicine_name,
+        drug_type=drug_type,
+        disposal_date=disposal_date
+    )
 
-    data["disposal_alarms"].append(new_alarm)
-    save_data(data)
+    db.add(alarm)
+    db.commit()
+    db.refresh(alarm)
 
-    return new_alarm
+    return alarm
 
 
-# 🔥 전체 조회
+# 🔥 조회
 @router.get("/disposal")
-def get_disposal_alarms():
-    data = load_data()
-    return data["disposal_alarms"]
+def get_disposal_alarms(user_id: int, db: Session = Depends(get_db)):
+    return db.query(DisposalAlarm).filter(
+        DisposalAlarm.user_id == user_id
+    ).all()
